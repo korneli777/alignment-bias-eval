@@ -1,0 +1,303 @@
+{
+  "spec": {
+    "model_id": "mistralai/Mistral-Small-24B-Base-2501",
+    "family": "mistral",
+    "generation": "Mistral Small 3",
+    "size": "24B",
+    "variant": "base",
+    "num_layers": 40,
+    "hidden_size": 5120
+  },
+  "attribute": "gender",
+  "layers": [
+    {
+      "layer": 0,
+      "layer_normalized": 0.0,
+      "attribute": "gender",
+      "mean_accuracy": 0.325,
+      "std_accuracy": 0.12747548783981963
+    },
+    {
+      "layer": 1,
+      "layer_normalized": 0.02564102564102564,
+      "attribute": "gender",
+      "mean_accuracy": 0.575,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 2,
+      "layer_normalized": 0.05128205128205128,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 3,
+      "layer_normalized": 0.07692307692307693,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 4,
+      "layer_normalized": 0.10256410256410256,
+      "attribute": "gender",
+      "mean_accuracy": 0.675,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 5,
+      "layer_normalized": 0.1282051282051282,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.21505813167606566
+    },
+    {
+      "layer": 6,
+      "layer_normalized": 0.15384615384615385,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.2
+    },
+    {
+      "layer": 7,
+      "layer_normalized": 0.1794871794871795,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.203100960115899
+    },
+    {
+      "layer": 8,
+      "layer_normalized": 0.20512820512820512,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.1457737973711325
+    },
+    {
+      "layer": 9,
+      "layer_normalized": 0.23076923076923078,
+      "attribute": "gender",
+      "mean_accuracy": 0.65,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 10,
+      "layer_normalized": 0.2564102564102564,
+      "attribute": "gender",
+      "mean_accuracy": 0.65,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 11,
+      "layer_normalized": 0.28205128205128205,
+      "attribute": "gender",
+      "mean_accuracy": 0.675,
+      "std_accuracy": 0.06123724356957946
+    },
+    {
+      "layer": 12,
+      "layer_normalized": 0.3076923076923077,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 13,
+      "layer_normalized": 0.3333333333333333,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 14,
+      "layer_normalized": 0.358974358974359,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.13693063937629152
+    },
+    {
+      "layer": 15,
+      "layer_normalized": 0.38461538461538464,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 16,
+      "layer_normalized": 0.41025641025641024,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 17,
+      "layer_normalized": 0.4358974358974359,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.06123724356957945
+    },
+    {
+      "layer": 18,
+      "layer_normalized": 0.46153846153846156,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.09999999999999999
+    },
+    {
+      "layer": 19,
+      "layer_normalized": 0.48717948717948717,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.09999999999999999
+    },
+    {
+      "layer": 20,
+      "layer_normalized": 0.5128205128205128,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.09354143466934853
+    },
+    {
+      "layer": 21,
+      "layer_normalized": 0.5384615384615384,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 22,
+      "layer_normalized": 0.5641025641025641,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 23,
+      "layer_normalized": 0.5897435897435898,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 24,
+      "layer_normalized": 0.6153846153846154,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 25,
+      "layer_normalized": 0.6410256410256411,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 26,
+      "layer_normalized": 0.6666666666666666,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 27,
+      "layer_normalized": 0.6923076923076923,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 28,
+      "layer_normalized": 0.717948717948718,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 29,
+      "layer_normalized": 0.7435897435897436,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 30,
+      "layer_normalized": 0.7692307692307693,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 31,
+      "layer_normalized": 0.7948717948717948,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 32,
+      "layer_normalized": 0.8205128205128205,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 33,
+      "layer_normalized": 0.8461538461538461,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 34,
+      "layer_normalized": 0.8717948717948718,
+      "attribute": "gender",
+      "mean_accuracy": 0.825,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 35,
+      "layer_normalized": 0.8974358974358975,
+      "attribute": "gender",
+      "mean_accuracy": 0.825,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 36,
+      "layer_normalized": 0.9230769230769231,
+      "attribute": "gender",
+      "mean_accuracy": 0.825,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 37,
+      "layer_normalized": 0.9487179487179487,
+      "attribute": "gender",
+      "mean_accuracy": 0.825,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 38,
+      "layer_normalized": 0.9743589743589743,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.09999999999999999
+    },
+    {
+      "layer": 39,
+      "layer_normalized": 1.0,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    }
+  ],
+  "runtime": {
+    "timestamp": "2026-05-07T13:32:58.300708+00:00",
+    "platform": "Linux-6.6.113+-x86_64-with-glibc2.35",
+    "python": "3.12.13",
+    "torch": "2.10.0+cu128",
+    "transformers": "5.0.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA RTX PRO 6000 Blackwell Server Edition"
+  }
+}

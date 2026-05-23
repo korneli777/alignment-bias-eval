@@ -1,0 +1,247 @@
+{
+  "spec": {
+    "model_id": "meta-llama/Llama-2-7b-chat-hf",
+    "family": "llama",
+    "generation": "Llama 2",
+    "size": "7B",
+    "variant": "instruct",
+    "num_layers": 32,
+    "hidden_size": 4096
+  },
+  "attribute": "gender",
+  "layers": [
+    {
+      "layer": 0,
+      "layer_normalized": 0.0,
+      "attribute": "gender",
+      "mean_accuracy": 0.6,
+      "std_accuracy": 0.1457737973711325
+    },
+    {
+      "layer": 1,
+      "layer_normalized": 0.03225806451612903,
+      "attribute": "gender",
+      "mean_accuracy": 0.625,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 2,
+      "layer_normalized": 0.06451612903225806,
+      "attribute": "gender",
+      "mean_accuracy": 0.625,
+      "std_accuracy": 0.15811388300841897
+    },
+    {
+      "layer": 3,
+      "layer_normalized": 0.0967741935483871,
+      "attribute": "gender",
+      "mean_accuracy": 0.625,
+      "std_accuracy": 0.13693063937629152
+    },
+    {
+      "layer": 4,
+      "layer_normalized": 0.12903225806451613,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.09999999999999999
+    },
+    {
+      "layer": 5,
+      "layer_normalized": 0.16129032258064516,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 6,
+      "layer_normalized": 0.1935483870967742,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 7,
+      "layer_normalized": 0.22580645161290322,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.1274754878398196
+    },
+    {
+      "layer": 8,
+      "layer_normalized": 0.25806451612903225,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.1457737973711325
+    },
+    {
+      "layer": 9,
+      "layer_normalized": 0.2903225806451613,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.1457737973711325
+    },
+    {
+      "layer": 10,
+      "layer_normalized": 0.3225806451612903,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.13693063937629152
+    },
+    {
+      "layer": 11,
+      "layer_normalized": 0.3548387096774194,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.12747548783981963
+    },
+    {
+      "layer": 12,
+      "layer_normalized": 0.3870967741935484,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    },
+    {
+      "layer": 13,
+      "layer_normalized": 0.41935483870967744,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 14,
+      "layer_normalized": 0.45161290322580644,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 15,
+      "layer_normalized": 0.4838709677419355,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.1224744871391589
+    },
+    {
+      "layer": 16,
+      "layer_normalized": 0.5161290322580645,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.22360679774997896
+    },
+    {
+      "layer": 17,
+      "layer_normalized": 0.5483870967741935,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.2806243040080456
+    },
+    {
+      "layer": 18,
+      "layer_normalized": 0.5806451612903226,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.2091650066335189
+    },
+    {
+      "layer": 19,
+      "layer_normalized": 0.6129032258064516,
+      "attribute": "gender",
+      "mean_accuracy": 0.7,
+      "std_accuracy": 0.257390753524675
+    },
+    {
+      "layer": 20,
+      "layer_normalized": 0.6451612903225806,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.2669269563007828
+    },
+    {
+      "layer": 21,
+      "layer_normalized": 0.6774193548387096,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.2669269563007828
+    },
+    {
+      "layer": 22,
+      "layer_normalized": 0.7096774193548387,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.22360679774997896
+    },
+    {
+      "layer": 23,
+      "layer_normalized": 0.7419354838709677,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.22360679774997896
+    },
+    {
+      "layer": 24,
+      "layer_normalized": 0.7741935483870968,
+      "attribute": "gender",
+      "mean_accuracy": 0.725,
+      "std_accuracy": 0.2669269563007828
+    },
+    {
+      "layer": 25,
+      "layer_normalized": 0.8064516129032258,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.22360679774997896
+    },
+    {
+      "layer": 26,
+      "layer_normalized": 0.8387096774193549,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.22360679774997896
+    },
+    {
+      "layer": 27,
+      "layer_normalized": 0.8709677419354839,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.18371173070873836
+    },
+    {
+      "layer": 28,
+      "layer_normalized": 0.9032258064516129,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.18371173070873836
+    },
+    {
+      "layer": 29,
+      "layer_normalized": 0.9354838709677419,
+      "attribute": "gender",
+      "mean_accuracy": 0.775,
+      "std_accuracy": 0.18371173070873836
+    },
+    {
+      "layer": 30,
+      "layer_normalized": 0.967741935483871,
+      "attribute": "gender",
+      "mean_accuracy": 0.8,
+      "std_accuracy": 0.15
+    },
+    {
+      "layer": 31,
+      "layer_normalized": 1.0,
+      "attribute": "gender",
+      "mean_accuracy": 0.75,
+      "std_accuracy": 0.11180339887498948
+    }
+  ],
+  "runtime": {
+    "timestamp": "2026-05-04T06:04:38.900039+00:00",
+    "platform": "Linux-6.6.113+-x86_64-with-glibc2.35",
+    "python": "3.12.13",
+    "torch": "2.10.0+cu128",
+    "transformers": "5.0.0",
+    "cuda_available": true,
+    "cuda_device": "NVIDIA H100 80GB HBM3"
+  }
+}

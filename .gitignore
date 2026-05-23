@@ -1,0 +1,58 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+.installed.cfg
+*.manifest
+*.spec
+
+# Virtual envs
+.venv/
+venv/
+env/
+.clean_venv/
+
+# Editors / OS
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+
+# Jupyter
+.ipynb_checkpoints/
+*-checkpoint.ipynb
+
+# Generated figures (rebuilt by scripts)
+figures/*.png
+figures/*.pdf
+figures/extended_views/*.png
+figures/extended_views/*.pdf
+!figures/source/
+
+# Pytest
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Large data — held back during double-blind review
+data/raw_logit_scores/
+data/activations/
+data/intervention_projections/
+
+# Logs
+*.log
+wandb/
+
+# Local secrets
+.env
+.env.local

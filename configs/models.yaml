@@ -1,0 +1,300 @@
+  # Model registry consumed by every run_*.py script. Each entry under a
+  # family defines a (base, instruct) pair; the toolkit iterates over them.
+  # The release ships 27 pairs (Llama, Qwen, Mistral, Gemma) loaded in
+  # bfloat16; add your own families or swap individual model_ids as needed.
+
+families:
+  llama:
+    display_name: "Llama"
+    vendor: "Meta"
+    requires_hf_auth: true
+    generations:
+      - name: "Llama 2"
+        release_date: "2023-07"
+        models:
+          - size: "7B"
+            base_id: "meta-llama/Llama-2-7b-hf"
+            instruct_id: "meta-llama/Llama-2-7b-chat-hf"
+            num_params: 7_000_000_000
+            num_layers: 32
+            hidden_size: 4096
+            dtype: "bfloat16"
+          - size: "13B"
+            base_id: "meta-llama/Llama-2-13b-hf"
+            instruct_id: "meta-llama/Llama-2-13b-chat-hf"
+            num_params: 13_000_000_000
+            num_layers: 40
+            hidden_size: 5120
+            dtype: "bfloat16"
+      - name: "Llama 3"
+        release_date: "2024-04"
+        models:
+          - size: "8B"
+            base_id: "meta-llama/Meta-Llama-3-8B"
+            instruct_id: "meta-llama/Meta-Llama-3-8B-Instruct"
+            num_params: 8_000_000_000
+            num_layers: 32
+            hidden_size: 4096
+            dtype: "bfloat16"
+      - name: "Llama 3.1"
+        release_date: "2024-07"
+        models:
+          - size: "8B"
+            base_id: "meta-llama/Llama-3.1-8B"
+            instruct_id: "meta-llama/Llama-3.1-8B-Instruct"
+            num_params: 8_000_000_000
+            num_layers: 32
+            hidden_size: 4096
+            dtype: "bfloat16"
+      - name: "Llama 3.2"
+        release_date: "2024-09"
+        models:
+          - size: "1B"
+            base_id: "meta-llama/Llama-3.2-1B"
+            instruct_id: "meta-llama/Llama-3.2-1B-Instruct"
+            num_params: 1_000_000_000
+            num_layers: 16
+            hidden_size: 2048
+            dtype: "bfloat16"
+          - size: "3B"
+            base_id: "meta-llama/Llama-3.2-3B"
+            instruct_id: "meta-llama/Llama-3.2-3B-Instruct"
+            num_params: 3_000_000_000
+            num_layers: 28
+            hidden_size: 3072
+            dtype: "bfloat16"
+
+  qwen:
+    display_name: "Qwen"
+    vendor: "Alibaba"
+    requires_hf_auth: false
+    notes: "Qwen3 inverts the naming convention: -Base = base, no suffix = instruct."
+    generations:
+      - name: "Qwen 2.5"
+        release_date: "2024-09"
+        models:
+          - size: "0.5B"
+            base_id: "Qwen/Qwen2.5-0.5B"
+            instruct_id: "Qwen/Qwen2.5-0.5B-Instruct"
+            num_params: 500_000_000
+            num_layers: 24
+            hidden_size: 896
+            dtype: "bfloat16"
+          - size: "1.5B"
+            base_id: "Qwen/Qwen2.5-1.5B"
+            instruct_id: "Qwen/Qwen2.5-1.5B-Instruct"
+            num_params: 1_500_000_000
+            num_layers: 28
+            hidden_size: 1536
+            dtype: "bfloat16"
+          - size: "3B"
+            base_id: "Qwen/Qwen2.5-3B"
+            instruct_id: "Qwen/Qwen2.5-3B-Instruct"
+            num_params: 3_000_000_000
+            num_layers: 36
+            hidden_size: 2048
+            dtype: "bfloat16"
+          - size: "7B"
+            base_id: "Qwen/Qwen2.5-7B"
+            instruct_id: "Qwen/Qwen2.5-7B-Instruct"
+            num_params: 7_000_000_000
+            num_layers: 28
+            hidden_size: 3584
+            dtype: "bfloat16"
+          - size: "14B"
+            base_id: "Qwen/Qwen2.5-14B"
+            instruct_id: "Qwen/Qwen2.5-14B-Instruct"
+            num_params: 14_000_000_000
+            num_layers: 48
+            hidden_size: 5120
+            dtype: "bfloat16"
+          # Qwen 2.5-32B excluded: ~64GB in bf16 doesn't fit on A100 40GB
+          # disk and won't load on standard Colab without H100. Sufficient
+          # size axis is preserved by 0.5B → 14B (~4.5 orders of magnitude).
+      - name: "Qwen 3"
+        release_date: "2025-04"
+        models:
+          - size: "0.6B"
+            base_id: "Qwen/Qwen3-0.6B-Base"
+            instruct_id: "Qwen/Qwen3-0.6B"
+            num_params: 600_000_000
+            num_layers: 28
+            hidden_size: 1024
+            dtype: "bfloat16"
+          - size: "1.7B"
+            base_id: "Qwen/Qwen3-1.7B-Base"
+            instruct_id: "Qwen/Qwen3-1.7B"
+            num_params: 1_700_000_000
+            num_layers: 28
+            hidden_size: 2048
+            dtype: "bfloat16"
+          - size: "4B"
+            base_id: "Qwen/Qwen3-4B-Base"
+            instruct_id: "Qwen/Qwen3-4B"
+            num_params: 4_000_000_000
+            num_layers: 36
+            hidden_size: 2560
+            dtype: "bfloat16"
+          - size: "8B"
+            base_id: "Qwen/Qwen3-8B-Base"
+            instruct_id: "Qwen/Qwen3-8B"
+            num_params: 8_000_000_000
+            num_layers: 36
+            hidden_size: 4096
+            dtype: "bfloat16"
+          - size: "14B"
+            base_id: "Qwen/Qwen3-14B-Base"
+            instruct_id: "Qwen/Qwen3-14B"
+            num_params: 14_000_000_000
+            num_layers: 40
+            hidden_size: 5120
+            dtype: "bfloat16"
+          # Qwen 3-32B excluded: Qwen released only the instruct checkpoint
+          # publicly (Qwen3-32B-Base returns 401), so there's no base to
+          # pair against. Plus same disk-fit issues as Qwen 2.5-32B.
+
+  gemma:
+    display_name: "Gemma"
+    vendor: "Google"
+    requires_hf_auth: true
+    generations:
+      - name: "Gemma 1"
+        release_date: "2024-02"
+        models:
+          - size: "2B"
+            base_id: "google/gemma-2b"
+            instruct_id: "google/gemma-2b-it"
+            num_params: 2_000_000_000
+            num_layers: 18
+            hidden_size: 2048
+            dtype: "bfloat16"
+            model_class: "AutoModelForCausalLM"
+          - size: "7B"
+            base_id: "google/gemma-7b"
+            instruct_id: "google/gemma-7b-it"
+            num_params: 7_000_000_000
+            num_layers: 28
+            hidden_size: 3072
+            dtype: "bfloat16"
+            model_class: "AutoModelForCausalLM"
+      - name: "Gemma 2"
+        release_date: "2024-06"
+        models:
+          - size: "2B"
+            base_id: "google/gemma-2-2b"
+            instruct_id: "google/gemma-2-2b-it"
+            num_params: 2_000_000_000
+            num_layers: 26
+            hidden_size: 2304
+            dtype: "bfloat16"
+            model_class: "AutoModelForCausalLM"
+          - size: "9B"
+            base_id: "google/gemma-2-9b"
+            instruct_id: "google/gemma-2-9b-it"
+            num_params: 9_000_000_000
+            num_layers: 42
+            hidden_size: 3584
+            dtype: "bfloat16"
+            model_class: "AutoModelForCausalLM"
+      - name: "Gemma 3"
+        release_date: "2025-03"
+        notes: "1B is text-only; 4B/12B/27B are multimodal — load with Gemma3ForCausalLM for text-only mode."
+        models:
+          - size: "1B"
+            base_id: "google/gemma-3-1b-pt"
+            instruct_id: "google/gemma-3-1b-it"
+            num_params: 1_000_000_000
+            num_layers: 26
+            hidden_size: 1152
+            dtype: "bfloat16"
+            model_class: "Gemma3ForCausalLM"
+          - size: "4B"
+            base_id: "google/gemma-3-4b-pt"
+            instruct_id: "google/gemma-3-4b-it"
+            num_params: 4_000_000_000
+            num_layers: 34
+            hidden_size: 2560
+            dtype: "bfloat16"
+            model_class: "Gemma3ForCausalLM"
+          - size: "12B"
+            base_id: "google/gemma-3-12b-pt"
+            instruct_id: "google/gemma-3-12b-it"
+            num_params: 12_000_000_000
+            num_layers: 48
+            hidden_size: 3840
+            dtype: "bfloat16"
+            model_class: "Gemma3ForCausalLM"
+  mistral:
+    display_name: "Mistral"
+    vendor: "Mistral AI"
+    requires_hf_auth: false
+    generations:
+      - name: "Mistral v0.1"
+        release_date: "2023-09"
+        models:
+          - size: "7B"
+            base_id: "mistralai/Mistral-7B-v0.1"
+            instruct_id: "mistralai/Mistral-7B-Instruct-v0.1"
+            num_params: 7_000_000_000
+            num_layers: 32
+            hidden_size: 4096
+            dtype: "bfloat16"
+      # Mistral v0.2 excluded: Mistral released only the instruct checkpoint
+      - name: "Mistral v0.3"
+        release_date: "2024-05"
+        models:
+          - size: "7B"
+            base_id: "mistralai/Mistral-7B-v0.3"
+            instruct_id: "mistralai/Mistral-7B-Instruct-v0.3"
+            num_params: 7_000_000_000
+            num_layers: 32
+            hidden_size: 4096
+            dtype: "bfloat16"
+      - name: "Mistral Nemo"
+        release_date: "2024-07"
+        notes: "Mistral × NVIDIA collaboration; standard AutoModelForCausalLM."
+        models:
+          - size: "12B"
+            base_id: "mistralai/Mistral-Nemo-Base-2407"
+            instruct_id: "mistralai/Mistral-Nemo-Instruct-2407"
+            num_params: 12_000_000_000
+            num_layers: 40
+            hidden_size: 5120
+            dtype: "bfloat16"
+      - name: "Mistral Small 3"
+        release_date: "2025-01"
+        models:
+          - size: "24B"
+            base_id: "mistralai/Mistral-Small-24B-Base-2501"
+            instruct_id: "mistralai/Mistral-Small-24B-Instruct-2501"
+            num_params: 24_000_000_000
+            num_layers: 40
+            hidden_size: 5120
+            dtype: "bfloat16"
+            notes: "~48GB in bf16, fits H100 80GB"
+
+# Subset for linear probing + INLP/LEACE intervention.
+# Spans 4-24B (~0.8 orders of magnitude)
+# For models >14B, stream activations to disk one layer at a time.
+probing_subset:
+  # 4-9B: original cross-family representative pairs
+  - "meta-llama/Llama-2-7b-hf"
+  - "meta-llama/Llama-2-7b-chat-hf"
+  - "meta-llama/Llama-3.1-8B"
+  - "meta-llama/Llama-3.1-8B-Instruct"
+  - "Qwen/Qwen2.5-7B"
+  - "Qwen/Qwen2.5-7B-Instruct"
+  - "google/gemma-2-9b"
+  - "google/gemma-2-9b-it"
+  - "google/gemma-3-4b-pt"
+  - "google/gemma-3-4b-it"
+  - "mistralai/Mistral-7B-v0.3"
+  - "mistralai/Mistral-7B-Instruct-v0.3"
+  # 13-24B: extension for size-axis breadth in the probing stage
+  - "meta-llama/Llama-2-13b-hf"
+  - "meta-llama/Llama-2-13b-chat-hf"
+  - "mistralai/Mistral-Small-24B-Base-2501"
+  - "mistralai/Mistral-Small-24B-Instruct-2501"
+
+# Used for the local smoke test. Tiny CPU-runnable model.
+smoke_test_model: "sshleifer/tiny-gpt2"

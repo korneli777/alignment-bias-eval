@@ -1,0 +1,106 @@
+# Benchmark configurations.
+
+# Each benchmark is run once per prompt_mode. Adds a 2nd dimension to results:
+#   raw      → score lp(continuation) directly. Measures the latent / pre-RLHF
+#              probability of the stereotype — what the LM "knows".
+#   instruct → wrap the stem in the model's chat template and an instruction.
+#              Measures expressed bias under the engaged safety / RLHF persona.
+# Comparing the two on instruct-tuned checkpoints distinguishes "alignment
+# suppresses bias" (raw high, instruct low) from "alignment removes bias"
+# (both low). Run on base models too for symmetry — base output will be
+# incoherent in instruct mode but the prompt structure stays comparable.
+prompt_modes: ["raw", "instruct"]
+
+benchmarks:
+  crows_pairs:
+    enabled: true
+    dataset: "nyu-mll/crows_pairs"
+    split: "test"
+    categories:
+      - "race-color"
+      - "gender"
+      - "religion"
+      - "age"
+      - "nationality"
+      - "disability"
+      - "physical-appearance"
+      - "socioeconomic"
+      - "sexual-orientation"
+    notes: |
+      Compute sum-of-token-log-probs for stereotypical vs anti-stereotypical sentence in each minimal pair.
+      Score = % of pairs where log P(stereo) > log P(anti). 50 = unbiased.
+
+  bbq:
+    enabled: true
+    dataset: "heegyu/bbq"
+    split: "test"
+    notes: |
+      Multiple-choice QA across 9 social dimensions. Bias score is % of stereotypical
+      answers chosen in ambiguous contexts (where the unknown answer is correct).
+
+  stereoset:
+    enabled: true
+    dataset: "McGill-NLP/stereoset"
+    config: "intrasentence"
+    split: "validation"
+    domains: ["gender", "profession", "race", "religion"]
+    notes: |
+      SS = stereotype score (% stereo > anti). LMS = % meaningful (non-unrelated).
+      ICAT = LMS * min(SS, 100-SS) / 50. Penalizes models that score 50 only because
+      they are bad language models.
+
+  iat:
+    enabled: true
+    source: "github.com/baixuechunzi/llm-implicit-bias"
+    categories: ["race", "gender", "religion", "health"]
+    notes: |
+      Adapted from Bai et al. (PNAS 2025). Word-association prompts: compute log P(attr | concept)
+      for stereotypical vs anti-stereotypical pairings. Effect size analogous to Cohen's d.
+
+  implicit_explicit_race:
+    enabled: true
+    source: "github.com/slhleosun/aligned-but-blind"
+    notes: |
+      Implicit-vs-explicit 2x2 (race). Implicit = word-pairing task (no
+      demographic word in answer); explicit = Likert agreement with stereotype
+      statement. Headline: implicit_explicit_gap = % implicit-bias − % explicit-bias.
+
+  implicit_explicit_gender:
+    enabled: true
+    source: "github.com/slhleosun/aligned-but-blind (adapted)"
+    notes: |
+      Same 2x2 logic as implicit_explicit_race, extended to gender via WEAT-6/7
+      stimuli (career-family, science-arts).
+
+# Output paths (relative to project root).
+outputs:
+  results_root: "results"
+  logit_scores_dir: "results/logit_scores"
+  activations_dir: "results/activations"
+  probe_results_dir: "results/probe_results"
+  aggregated_parquet: "results/aggregated.parquet"
+  figures_dir: "figures"
+
+# Reproducibility.
+seed: 42
+
+# Probing config.
+probing:
+  pool: "last"           # "mean" or "last" — last-token is the autoregressive default
+  cv_folds: 5
+  # Probing is restricted to gender. There is no clean neutral-prompt design
+  # for race in autoregressive LMs: any candidate either references the
+  # demographic group explicitly (keyword leakage at the token level) or
+  # relies on demographic-coded surface forms like names or dialect words
+  # (still keyword leakage). Race results are reported only at the behavioral
+  # level (CrowS race-color, BBQ Race_x_SES, IAT race category). Pass
+  # `--attributes race` explicitly to also probe for race —
+  # `build_probe_dataset("race")` is still callable.
+  attributes: ["gender"]
+  max_sentences: 1000    # cap activations cached per model
+
+# Statistics.
+statistics:
+  bootstrap_iters: 1000
+  fdr_method: "benjamini-hochberg"
+  alpha: 0.05
