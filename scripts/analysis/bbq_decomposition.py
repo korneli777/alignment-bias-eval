@@ -21,7 +21,7 @@ import pandas as pd
 import yaml
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _common import check_close, check_count, check_pct, render_section
+from _common import CheckResult, check_close, check_count, check_pct, render_section
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -58,6 +58,47 @@ def bbq_per_pair(logit_df: pd.DataFrame) -> pd.DataFrame:
             "cond_inst":      score(inst_id, "instruct",  "overall_conditional_bias"),
         })
     return pd.DataFrame(rows)
+
+
+def bbq_recoverability(logit_df: pd.DataFrame, *, n_iter: int = 10_000,
+                       seed: int = 42) -> dict:
+    """Per-pair Δ on overall_bias_ambig = (instruct+persona) − base, plus a
+    paired bootstrap 95% CI. Only pairs with all three modes present (base
+    raw, instruct chat-templated, instruct jailbreak) are included.
+    """
+    pairs = load_pairs()
+
+    def score(model_id, prompt_mode):
+        sub = logit_df[(logit_df["model_id"] == model_id)
+                        & (logit_df["benchmark"] == "bbq")
+                        & (logit_df["prompt_mode"] == prompt_mode)
+                        & (logit_df["metric"] == "overall_bias_ambig")]
+        return float(sub["value"].iloc[0]) if not sub.empty else float("nan")
+
+    base, inst, jail = [], [], []
+    for base_id, inst_id, family, generation, size in pairs:
+        b = score(base_id, "raw")
+        i = score(inst_id, "instruct")
+        j = score(inst_id, "jailbreak")
+        if any(np.isnan(v) for v in (b, i, j)):
+            continue
+        base.append(b); inst.append(i); jail.append(j)
+    base = np.asarray(base); inst = np.asarray(inst); jail = np.asarray(jail)
+
+    deltas = jail - base
+    rng = np.random.default_rng(seed)
+    n = len(deltas)
+    boots = np.array([deltas[rng.integers(0, n, n)].mean() for _ in range(n_iter)])
+
+    return {
+        "n_pairs":       n,
+        "base_mean":     float(base.mean()),
+        "instruct_mean": float(inst.mean()),
+        "jailbreak_mean": float(jail.mean()),
+        "delta_point":   float(deltas.mean()),
+        "delta_ci_lo":   float(np.quantile(boots, 0.025)),
+        "delta_ci_hi":   float(np.quantile(boots, 0.975)),
+    }
 
 
 def crows_jailbreak_rebound(logit_df: pd.DataFrame) -> pd.DataFrame:
@@ -144,10 +185,28 @@ def run() -> int:
         check_close("Mean rebound — gender category", 4.2, gender_rebound, tol=0.5),
     ]
 
+    # ─── BBQ persona-injection recoverability ──────────────────────────────
+    rec = bbq_recoverability(logit_df)
+    ci_contains_zero = rec["delta_ci_lo"] <= 0.0 <= rec["delta_ci_hi"]
+    recoverability_checks = [
+        check_count("n pairs (matched)", 27, rec["n_pairs"]),
+        check_close("Mean base bias_ambig",            0.033, rec["base_mean"],      tol=0.005),
+        check_close("Mean instruct bias_ambig",        0.028, rec["instruct_mean"],  tol=0.005),
+        check_close("Mean instruct+persona bias_ambig", 0.033, rec["jailbreak_mean"], tol=0.005),
+        check_close("Paired Δ_recover (point)",        0.001, rec["delta_point"],    tol=0.005),
+        CheckResult(
+            label="Δ_recover 95% CI contains 0",
+            paper="[≤0, ≥0]",
+            computed=f"[{rec['delta_ci_lo']:+.3f}, {rec['delta_ci_hi']:+.3f}]",
+            passed=ci_contains_zero,
+        ),
+    ]
+
     fails = 0
     fails += render_section("§3.2 BBQ deferral + conditional bias", deferral_checks)
     fails += render_section("§3.2 CrowS jailbreak rebound", rebound_checks)
     fails += render_section("§3.2 Per-category rebound", category_checks)
+    fails += render_section("§3.2 BBQ persona-injection recoverability", recoverability_checks)
     return fails
 
 
