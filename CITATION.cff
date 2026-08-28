@@ -1,0 +1,49 @@
+cff-version: 1.2.0
+message: >-
+  If you use this software, please cite the paper it accompanies (below).
+title: biaseval
+abstract: >-
+  Code and released results for evaluating stereotypical bias across matched
+  base and instruction-tuned language models. Includes CrowS-Pairs, StereoSet,
+  BBQ, and IAT scoring; adversarial prompt framings; residual-stream probing;
+  and INLP/LEACE concept-erasure interventions.
+type: software
+version: 1.0.0
+date-released: 2026-08-28
+license: MIT
+repository-code: "https://github.com/korneli777/alignment-bias-eval"
+authors:
+  - family-names: Havstein
+    given-names: Sigurd Kornelius
+    email: qjp403@alumni.ku.dk
+    affiliation: University of Copenhagen
+  - family-names: Søgaard
+    given-names: Anders
+    affiliation: University of Copenhagen
+keywords:
+  - stereotypical bias
+  - language model alignment
+  - chat templates
+  - linear probing
+  - bias evaluation
+preferred-citation:
+  type: conference-paper
+  # Update this entry with the ACL Anthology metadata when published.
+  status: in-press
+  title: >-
+    Does Alignment Debias or Just Suppress? Evaluating Stereotypical Bias
+    Across Base-Instruct Pairs
+  authors:
+    - family-names: Havstein
+      given-names: Sigurd Kornelius
+      affiliation: University of Copenhagen
+    - family-names: Søgaard
+      given-names: Anders
+      affiliation: University of Copenhagen
+  collection-title: >-
+    Proceedings of the 2026 Conference on Empirical Methods in Natural
+    Language Processing
+  conference:
+    name: >-
+      2026 Conference on Empirical Methods in Natural Language Processing
+  year: 2026

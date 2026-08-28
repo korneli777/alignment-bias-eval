@@ -44,6 +44,7 @@ def _runtime_metadata() -> dict[str, Any]:
 def logit_result_path(
     results_root: Path, benchmark: str, spec: ModelSpec, prompt_mode: str = "raw",
 ) -> Path:
+    """Score file for one benchmark, model, and prompt condition."""
     return (
         Path(results_root) / "raw_logit_scores" / benchmark
         / f"{spec.short_name}__{prompt_mode}.json"
@@ -51,10 +52,12 @@ def logit_result_path(
 
 
 def probe_result_path(results_root: Path, spec: ModelSpec, attribute: str) -> Path:
+    """Per-layer probe accuracies for one model and one attribute."""
     return Path(results_root) / "probe_results" / spec.short_name / f"{attribute}.json"
 
 
 def activation_dir(results_root: Path, spec: ModelSpec) -> Path:
+    """Directory of cached residual-stream activations for one model."""
     return Path(results_root) / "activations" / spec.short_name
 
 
@@ -73,6 +76,12 @@ def intervention_result_path(
     results_root: Path, benchmark: str, spec: ModelSpec,
     *, attribute: str, prompt_mode: str, method: str, layer_idx: int,
 ) -> Path:
+    """Score file for one intervened run.
+
+    One model contributes a separate file per attribute, prompt mode, erasure
+    method, and layer, so all four appear in the name. The layer index is
+    zero-padded to keep a directory listing sorted by depth.
+    """
     return (
         Path(results_root) / "intervention_results" / benchmark
         / f"{spec.short_name}__{attribute}__{prompt_mode}__{method}__L{layer_idx:02d}.json"
@@ -104,6 +113,12 @@ def _spec_payload(spec: ModelSpec) -> dict[str, Any]:
 def write_benchmark_result(
     results_root: Path, result: BenchmarkResult, spec: ModelSpec,
 ) -> Path:
+    """Write one benchmark run to its canonical path, and return that path.
+
+    The payload stores the scores alongside the model spec and the library
+    versions that produced them. A result file can therefore be traced back to
+    its environment without a separate log.
+    """
     path = logit_result_path(results_root, result.benchmark, spec, result.prompt_mode)
     write_json(path, {
         "spec": _spec_payload(spec),
@@ -117,6 +132,11 @@ def write_benchmark_result(
 def write_probe_result(
     results_root: Path, spec: ModelSpec, attribute: str, layer_results: list[dict],
 ) -> Path:
+    """Write one model's per-layer probe accuracies, and return the path.
+
+    Parameter count is dropped from the spec payload: probe results are indexed
+    by layer, and model size plays no part in reading them back.
+    """
     path = probe_result_path(results_root, spec, attribute)
     spec_payload = _spec_payload(spec)
     spec_payload.pop("num_params", None)  # not relevant for probe payload

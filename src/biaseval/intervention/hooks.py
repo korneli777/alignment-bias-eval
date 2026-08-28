@@ -48,6 +48,12 @@ class ProjectionHook(AbstractContextManager):
         *,
         bias: np.ndarray | None = None,
     ) -> None:
+        """Prepare the projection for one layer of `model`.
+
+        `projection` is cast to the model's dtype and device once here, not on
+        every forward pass. Pass `bias` for LEACE, whose erasure is affine; INLP
+        needs no bias term and leaves it None.
+        """
         self.model = model
         self.layer_idx = int(layer_idx)
         self.layer = _get_layer_module(model, self.layer_idx)

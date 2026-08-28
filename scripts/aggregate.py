@@ -10,9 +10,9 @@ Writes to:
     data/aggregated/probe.parquet
     data/aggregated/intervention.parquet
 
-Run this after a fresh GPU pipeline (or after downloading raw JSONs from
-the Zenodo deposit) to regenerate the parquet sheets that the analysis
-scripts and figure scripts read.
+Run this after a fresh GPU pipeline to regenerate the parquet sheets that
+the analysis and figure scripts read. The raw per-cell JSONs are not
+shipped with the repository; the parquets in `data/aggregated/` are.
 """
 
 from __future__ import annotations

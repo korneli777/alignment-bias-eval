@@ -1,4 +1,6 @@
-"""Stage 1 — score every model on each bias benchmark.
+"""Stage 1
+
+Score every model on each bias benchmark.
 
 Iterates over the registry × benchmarks. Each model is loaded once, all
 enabled benchmarks run, then unloaded. Per-cell JSONs go to
@@ -23,9 +25,25 @@ import traceback
 from pathlib import Path
 
 # Heavy imports (torch, transformers, biaseval.benchmarks) are deferred to
-# main() so that `--help` works without a GPU install.
+# main() so that `--help` works without a GPU install. The framing registry is
+# plain dataclasses with no torch dependency, so it is safe to import here.
+from biaseval.benchmarks.framings import FRAMINGS
 
-PROMPT_MODES = ("raw", "instruct", "jailbreak")
+# Default sweep is the two baselines. The jb_* framings are opt-in via
+# --prompt-modes because they multiply the cost of a full run; the paper's
+# ablation is exactly
+#   --prompt-modes jb_persona jb_roleplay jb_historical jb_refusal jb_academic jb_fluency
+PROMPT_MODES = ("raw", "instruct")
+ALL_PROMPT_MODES = (*PROMPT_MODES, *FRAMINGS)
+IMPLEMENTED_BENCHMARKS = ("crows_pairs", "stereoset", "bbq", "iat")
+
+# Framings need an instruct variant: base models have no alignment behaviour to
+# work against and often lack a chat template.
+INSTRUCT_ONLY = frozenset(FRAMINGS)
+
+# This is the proportional allocation budget. Independent rounding within each
+# BBQ category yields the released 6,001-item set. See Appendix A.3.
+BBQ_FRAMING_SUBSAMPLE = 6000
 
 logger = logging.getLogger(__name__)
 
@@ -43,10 +61,11 @@ def parse_args() -> argparse.Namespace:
                    help="Limit to specific HF model IDs (overrides --family).")
     p.add_argument("--variant", default=None, choices=["base", "instruct"])
     p.add_argument("--benchmarks", nargs="+", default=None,
+                   choices=list(IMPLEMENTED_BENCHMARKS),
                    help="Subset of benchmarks (default: all enabled in benchmarks.yaml).")
-    p.add_argument("--prompt-modes", nargs="+", default=list(PROMPT_MODES),
-                   choices=list(PROMPT_MODES),
-                   help="Prompt conditions to evaluate.")
+    p.add_argument("--prompt-modes", nargs="+", default=None,
+                   choices=list(ALL_PROMPT_MODES),
+                   help="Prompt conditions (default: prompt_modes in benchmarks.yaml).")
     p.add_argument("--limit", type=int, default=None,
                    help="Cap dataset size per benchmark (debugging only).")
     p.add_argument("--no-wandb", action="store_true")
@@ -93,6 +112,11 @@ def main() -> int:
     with open(args.bench_config) as f:
         bench_cfg = yaml.safe_load(f)
     enabled = [b for b, c in bench_cfg["benchmarks"].items() if c.get("enabled", True)]
+    unsupported = sorted(set(enabled) - set(runners))
+    if unsupported:
+        raise ValueError(
+            "Enabled benchmark(s) have no runner: " + ", ".join(unsupported)
+        )
     if args.benchmarks:
         enabled = [b for b in enabled if b in args.benchmarks]
     logger.info("Enabled benchmarks: %s", enabled)
@@ -117,14 +141,20 @@ def main() -> int:
     logger.info("Will evaluate %d models × %d benchmarks", len(specs), len(enabled))
 
     results_root = Path(args.results_root)
-    prompt_modes: list[str] = args.prompt_modes
+    prompt_modes: list[str] = args.prompt_modes or bench_cfg.get(
+        "prompt_modes", list(PROMPT_MODES)
+    )
     n_done, n_skipped, n_errors = 0, 0, 0
 
     for spec in specs:
-        # Jailbreak only makes sense on instruct variants — base models have
-        # no safety filter to bypass and may lack a chat template.
-        all_cells = [(b, pm) for b in enabled for pm in prompt_modes
-                     if not (pm == "jailbreak" and spec.variant != "instruct")]
+        all_cells = [
+            (b, pm) for b in enabled for pm in prompt_modes
+            # Adversarial conditions apply to instruct variants only.
+            if not (pm in INSTRUCT_ONLY and spec.variant != "instruct")
+            # The task-reframing control has no multiple-choice form.
+            and not (b == "bbq" and pm in FRAMINGS
+                     and FRAMINGS[pm].bbq_instruction is None)
+        ]
         pending = [(b, pm) for b, pm in all_cells
                    if not is_completed(logit_result_path(results_root, b, spec, pm))]
         if not pending:
@@ -135,7 +165,7 @@ def main() -> int:
         logger.info("[load] %s (pending: %d cells)", spec.model_id, len(pending))
         try:
             model, tokenizer = load_model(spec)
-        except Exception:
+        except Exception:  # Isolate failures to one model.
             logger.error("[error] failed to load %s\n%s",
                          spec.model_id, traceback.format_exc())
             n_errors += len(pending)
@@ -160,11 +190,15 @@ def main() -> int:
                     kwargs: dict = {"prompt_mode": pm}
                     if limit is not None and bench_name != "iat":
                         kwargs["limit"] = limit
+                    if bench_name == "bbq" and pm in FRAMINGS:
+                        kwargs |= {"ambiguous_only": True,
+                                   "subsample": BBQ_FRAMING_SUBSAMPLE,
+                                   "seed": args.seed}
                     result = runner(model, tokenizer, spec, **kwargs)
                     write_benchmark_result(results_root, result, spec)
                     tracker.summary_update(result.summary)
                     n_done += 1
-                except Exception:
+                except Exception:  # Isolate failures to one cell.
                     logger.error("[error] %s/%s on %s\n%s",
                                  bench_name, pm, spec.model_id, traceback.format_exc())
                     n_errors += 1

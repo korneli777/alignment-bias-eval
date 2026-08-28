@@ -21,6 +21,12 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class ProbeDataset:
+    """Labelled sentences for training one binary attribute probe.
+
+    `label_names` keeps the two classes in the order the integer labels use, so
+    a saved direction vector can be read back with a known sign convention.
+    """
+
     sentences: list[str]
     labels: list[int]
     label_names: tuple[str, str]

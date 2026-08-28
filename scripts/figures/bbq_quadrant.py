@@ -83,9 +83,11 @@ def make_figure(df: pd.DataFrame) -> Path:
     # Two outliers worth calling out: Mistral v0.1 7B (deferral drops
     # but conditional bias rises) and Qwen 3 8B (the one pair going the
     # debiasing-predicted direction on both axes).
-    arrow_style = dict(arrowstyle="-", color="#888", lw=0.6,
-                       shrinkA=0, shrinkB=4)
-    annot_style = dict(fontsize=6.5, color="#444", zorder=6)
+    arrow_style = {
+        "arrowstyle": "-", "color": "#888", "lw": 0.6,
+        "shrinkA": 0, "shrinkB": 4,
+    }
+    annot_style = {"fontsize": 6.5, "color": "#444", "zorder": 6}
 
     mv01 = df[(df.family == "mistral") & (df.generation == "Mistral v0.1")
               & (df["size"] == "7B")]
@@ -113,8 +115,10 @@ def make_figure(df: pd.DataFrame) -> Path:
             **annot_style,
         )
 
-    label_kw = dict(fontsize=6.5, color="#666", style="italic",
-                    transform=ax.transAxes, zorder=2)
+    label_kw = {
+        "fontsize": 6.5, "color": "#666", "style": "italic",
+        "transform": ax.transAxes, "zorder": 2,
+    }
     ax.text(0.98, 0.97, "more deferral\nmore cond. bias",
             ha="right", va="top",    **label_kw)
     ax.text(0.02, 0.97, "less deferral\nmore cond. bias",

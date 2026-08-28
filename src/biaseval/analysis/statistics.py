@@ -15,7 +15,7 @@ Conventions:
 from __future__ import annotations
 
 import json
-from collections.abc import Callable
+from collections.abc import Callable, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -45,6 +45,11 @@ def bootstrap_ci(
 
 
 def cohens_d(a: np.ndarray, b: np.ndarray) -> float:
+    """Cohen's d for two independent samples, using the pooled standard deviation.
+
+    Returns NaN rather than raising when d is undefined: fewer than two
+    observations in either sample, or zero pooled variance.
+    """
     a, b = np.asarray(a), np.asarray(b)
     if a.size < 2 or b.size < 2:
         return float("nan")
@@ -103,6 +108,36 @@ def cohens_d_paired(base: np.ndarray, instruct: np.ndarray) -> float:
     if sd == 0:
         return float("nan")
     return float(diff.mean() / sd)
+
+
+def paired_binary_effect_summary(
+    base: Sequence[bool], instruct: Sequence[bool]
+) -> dict[str, float | int]:
+    """Summarize paired binary outcomes and their paired Cohen's d."""
+    base_array = np.asarray(base, dtype=int)
+    instruct_array = np.asarray(instruct, dtype=int)
+    if base_array.size != instruct_array.size:
+        raise ValueError("paired outcome vectors must have the same length")
+    if base_array.size < 2:
+        raise ValueError("at least two paired outcomes are required")
+    if not np.isin(base_array, [0, 1]).all() or not np.isin(instruct_array, [0, 1]).all():
+        raise ValueError("paired outcomes must be binary")
+
+    differences = instruct_array - base_array
+    mean_difference = float(differences.mean())
+    sd_difference = float(differences.std(ddof=1))
+    effect_size = mean_difference / sd_difference if sd_difference else 0.0
+    return {
+        "n_items": int(differences.size),
+        "n_base_positive": int(base_array.sum()),
+        "n_instruct_positive": int(instruct_array.sum()),
+        "n_decrease": int((differences == -1).sum()),
+        "n_increase": int((differences == 1).sum()),
+        "n_unchanged": int((differences == 0).sum()),
+        "mean_difference": mean_difference,
+        "sd_difference": sd_difference,
+        "cohens_d": effect_size,
+    }
 
 
 def paired_permutation_test(

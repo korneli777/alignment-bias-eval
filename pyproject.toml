@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=68", "wheel"]
+requires = ["setuptools>=77", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -7,9 +7,12 @@ name = "biaseval"
 version = "1.0.0"
 description = "Stereotypical-bias evaluation for causal LMs: benchmarks, probes, and concept-erasure interventions"
 readme = "README.md"
-requires-python = ">=3.10,<3.13"
-license = {text = "MIT"}
-authors = [{name = "Anonymous", email = "anonymous@anonymous.invalid"}]
+requires-python = ">=3.10,<3.14"
+license = "MIT"
+authors = [
+    {name = "Sigurd Kornelius Havstein", email = "qjp403@alumni.ku.dk"},
+    {name = "Anders Søgaard"},
+]
 
 dependencies = [
     "numpy>=1.26,<2.3",
@@ -31,6 +34,7 @@ gpu = [
     "transformers>=4.40",
     "accelerate>=0.27",
     "bitsandbytes>=0.42",
+    "python-dotenv>=1.0",
 ]
 dev = [
     "pytest>=7.4",
@@ -42,12 +46,35 @@ tracking = [
     "python-dotenv>=1.0",
 ]
 
+[project.urls]
+Repository = "https://github.com/korneli777/alignment-bias-eval"
+Issues = "https://github.com/korneli777/alignment-bias-eval/issues"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
 [tool.ruff]
 line-length = 100
 target-version = "py310"
+src = ["src", "scripts", "tests"]
+
+[tool.ruff.lint]
+select = [
+    "E", "F", "W",   # pycodestyle / pyflakes
+    "I",             # isort
+    "B",             # bugbear
+    "UP",            # pyupgrade
+    "N",             # pep8-naming
+    "RUF",           # ruff-specific
+]
+ignore = [
+    "E501",   # line length is handled by the formatter
+    "N803",   # X, y are the sklearn convention for arguments
+    "N806",   # ...and for locals
+    "RUF001", # x / - / - are intentional in log and table output
+    "RUF002",
+    "RUF003",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
