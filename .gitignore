@@ -20,6 +20,7 @@ eggs/
 venv/
 env/
 .clean_venv/
+.uv-cache/
 
 # Editors / OS
 .vscode/
@@ -41,10 +42,11 @@ figures/extended_views/*.pdf
 
 # Pytest
 .pytest_cache/
+.ruff_cache/
 .coverage
 htmlcov/
 
-# Large data — held back during double-blind review
+# Large data. Regenerable from the code and public checkpoints
 data/raw_logit_scores/
 data/activations/
 data/intervention_projections/
@@ -56,3 +58,6 @@ wandb/
 # Local secrets
 .env
 .env.local
+
+# Local scratch files
+tmp/

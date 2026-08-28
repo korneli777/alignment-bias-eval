@@ -1,7 +1,9 @@
-"""Stage 3 — causal intervention via linear concept erasure.
+"""Stage 3
+
+Causal intervention via linear concept erasure.
 
 For each model in the probing subset:
-  1. Read the probe-accuracy JSON to find the peak layer per attribute.
+  1. Map the requested normalized depths to architecture-specific layers.
   2. Load the cached activations from data/activations/<model>/.
   3. Fit INLP and LEACE projection matrices and save to disk.
   4. Run sanity checks (probe nullification + LM perplexity).
@@ -248,7 +250,7 @@ def main() -> int:
         logger.info("[load] %s (%d pending cells)", spec.model_id, len(pending))
         try:
             model, tokenizer = load_model(spec)
-        except Exception:
+        except Exception:  # Isolate failures to one model.
             logger.error("[error] failed to load %s\n%s",
                          spec.model_id, traceback.format_exc())
             n_errors += 1
@@ -269,7 +271,7 @@ def main() -> int:
                         spec.model_id, attr, L, method,
                         ppl["perplexity_pre"], ppl["perplexity_post"], ppl["ratio"],
                     )
-            except Exception:
+            except Exception:  # Report all sanity-check failures.
                 logger.error("[error] perplexity check failed for %s/%s/L%d/%s\n%s",
                              spec.model_id, attr, L, method, traceback.format_exc())
 
@@ -320,7 +322,7 @@ def main() -> int:
                     )
                     tracker.summary_update(result.summary)
                     n_done += 1
-                except Exception:
+                except Exception:  # Isolate failures to one cell.
                     logger.error("[error] %s/%s/L%d/%s/%s on %s\n%s",
                                  bench, pm, L, attr, method, spec.model_id,
                                  traceback.format_exc())

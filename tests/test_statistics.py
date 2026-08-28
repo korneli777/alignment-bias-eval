@@ -10,9 +10,9 @@ from biaseval.analysis.statistics import (
     bootstrap_paired_delta_ci,
     cohens_d_paired,
     holm_bonferroni,
+    paired_binary_effect_summary,
     paired_permutation_test,
 )
-
 
 # ─── Cohen's d (paired) ──────────────────────────────────────────────────────
 
@@ -125,3 +125,20 @@ def test_bootstrap_paired_delta_point_matches_observed():
 def test_bootstrap_paired_delta_size_mismatch_returns_nan():
     point, lo, hi = bootstrap_paired_delta_ci(np.zeros(5), np.zeros(6))
     assert np.isnan(point) and np.isnan(lo) and np.isnan(hi)
+
+
+def test_paired_binary_effect_summary_uses_item_level_differences():
+    result = paired_binary_effect_summary(
+        [True, True, True, False],
+        [False, True, False, True],
+    )
+
+    assert result["n_items"] == 4
+    assert result["n_base_positive"] == 3
+    assert result["n_instruct_positive"] == 2
+    assert result["n_decrease"] == 2
+    assert result["n_increase"] == 1
+    assert result["n_unchanged"] == 1
+    assert result["mean_difference"] == -0.25
+    assert result["sd_difference"] == pytest.approx(0.957427, abs=1e-6)
+    assert result["cohens_d"] == pytest.approx(-0.261116, abs=1e-6)

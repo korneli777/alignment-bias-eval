@@ -2,7 +2,7 @@
 
 Two complementary fits, both reporting beta, 95% CI, and p-values:
 
-    1. Per-benchmark OLS with cluster-robust SEs on `model_id`, partialling
+    1. Per-benchmark OLS with HC3 heteroskedasticity-robust SEs, partialling
        out log10(num_params), family, generation, and prompt_mode.
     2. Per-example logistic GEE on CrowS-Pairs item-level outcomes with
        model-level clustering.
@@ -119,12 +119,10 @@ def _coef_dict(fit) -> dict[str, dict[str, float]]:
 
 
 def fit_summary_model(reg_df: pd.DataFrame, benchmark: str) -> dict[str, Any]:
-    """OLS with cluster-robust SEs on the per-checkpoint headline bias score.
+    """OLS with HC3 SEs on the per-checkpoint headline bias score.
 
-    Cluster on `model_id` to handle the within-checkpoint correlation between
-    the two prompt_mode observations. If fewer than 2 distinct families /
-    generations are present (smoke-test scenarios) the corresponding categorical
-    is dropped from the formula.
+    If fewer than two distinct families or generations are present (as in a
+    smoke test), the corresponding categorical term is dropped.
     """
     if reg_df.empty or "benchmark" not in reg_df.columns:
         return {"benchmark": benchmark, "n": 0, "model_type": "none", "note": "no data"}
@@ -143,18 +141,8 @@ def fit_summary_model(reg_df: pd.DataFrame, benchmark: str) -> dict[str, Any]:
     if sub["variant"].nunique() < 2:
         formula = formula.replace(" + C(variant, Treatment('base'))", "")
 
-    n_clusters = sub["model_id"].nunique()
-    use_cluster = n_clusters >= 4 and len(sub) > n_clusters
-
     try:
-        if use_cluster:
-            fit = smf.ols(formula, data=sub).fit(
-                cov_type="cluster", cov_kwds={"groups": sub["model_id"].values}
-            )
-            cov = "cluster_robust"
-        else:
-            fit = smf.ols(formula, data=sub).fit(cov_type="HC3")
-            cov = "HC3"
+        fit = smf.ols(formula, data=sub).fit(cov_type="HC3")
     except Exception as exc:
         logger.exception("OLS fit failed for %s", benchmark)
         return {"benchmark": benchmark, "n": len(sub), "model_type": "ols", "error": str(exc)}
@@ -162,9 +150,9 @@ def fit_summary_model(reg_df: pd.DataFrame, benchmark: str) -> dict[str, Any]:
     out = {
         "benchmark": benchmark,
         "n": len(sub),
-        "n_clusters": int(n_clusters),
+        "n_models": int(sub["model_id"].nunique()),
         "model_type": "ols",
-        "cov_type": cov,
+        "cov_type": "HC3",
         "formula": formula,
         "rsquared": float(getattr(fit, "rsquared", float("nan"))),
         **_coef_dict(fit),
@@ -288,8 +276,7 @@ def write_regression_report(
         ("Each fit estimates the effect of `variant` (base → instruct) on the "
          "headline bias metric **after partialling out** model size "
          "(log₁₀ params), family, generation, and prompt_mode.\n"),
-        ("Standard errors are clustered on `model_id` (each checkpoint contributes "
-         "two observations: raw and instruct prompt modes).\n"),
+        "Standard errors use the HC3 heteroskedasticity-robust estimator.\n",
     ]
 
     summary_fits: dict[str, dict[str, Any]] = {}
@@ -299,7 +286,7 @@ def write_regression_report(
         summary_fits[bench] = fit
         md.append(
             f"## {bench} ({fit.get('model_type', '?')}, "
-            f"n={fit.get('n', 0)}, clusters={fit.get('n_clusters', 0)}, "
+            f"n={fit.get('n', 0)}, models={fit.get('n_models', 0)}, "
             f"R²={fit.get('rsquared', float('nan')):.3f})\n"
         )
         md.append(coef_table_to_markdown(fit))

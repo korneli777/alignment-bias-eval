@@ -156,9 +156,9 @@ def load_iat_stimuli() -> list[dict]:
             key = (row["category"].strip(), row["dataset"].strip())
             g = grouped.setdefault(key, {"A": [], "B": [], "C": []})
             a, b, c = row["A"].strip(), row["B"].strip(), row["C"].strip()
-            if a: g["A"].append(a)
-            if b: g["B"].append(b)
-            if c: g["C"].append(c)
+            for letter, value in (("A", a), ("B", b), ("C", c)):
+                if value:
+                    g[letter].append(value)
 
     tests: list[dict] = []
     for (category, subcategory), g in grouped.items():

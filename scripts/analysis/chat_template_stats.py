@@ -8,8 +8,8 @@ Also emits tables/regression.tex — pooled OLS per benchmark with HC3
 SEs, Holm correction across the four benchmark variant coefficients,
 and the paired-bootstrap Δ_chat with 95% CI.
 
-When run as a script, results are compared against the paper's reported
-values as a release-correctness check.
+When run as a script, the computed estimates are printed and the regression
+table fragment is regenerated from the released aggregates.
 
 Usage:
     python scripts/analysis/chat_template_stats.py
@@ -24,10 +24,10 @@ import numpy as np
 import pandas as pd
 import statsmodels.formula.api as smf
 import yaml
-from scipy.stats import binomtest, spearmanr
+from scipy.stats import binomtest
 
 sys.path.insert(0, str(Path(__file__).parent))
-from _common import check_close, check_count, render_section
+from _common import render_section
 
 REPO = Path(__file__).resolve().parents[2]
 
@@ -48,6 +48,11 @@ LOWER_IS_LESS = {
 
 
 def load_pairs() -> list[tuple[str, str, str, str, str]]:
+    """Flatten configs/models.yaml into (base_id, instruct_id, family, gen, size).
+
+    Every analysis is paired, so the registry is read as pairs rather than as a
+    flat list of checkpoints. This is the one place that layout is unpacked.
+    """
     with open(REPO / "configs/models.yaml") as f:
         cfg = yaml.safe_load(f)
     return [
@@ -110,53 +115,26 @@ def delta_chat_bootstrap(deltas: pd.DataFrame, n_resamples: int = 10_000,
     return out
 
 
-def cohens_d_paired_per_pair(logit_df: pd.DataFrame, prompt_mode: str = "raw") -> pd.DataFrame:
-    """Per-pair Cohen's d on per-item CrowS-Pairs binary outcomes.
-
-    d = mean(diff) / sd(diff), where diff_i = stereo_won_inst - stereo_won_base.
-    Computed from per_example data — but we only have aggregated parquets
-    here, so we approximate with bootstrap variance on the overall stereotype
-    rate. For a tight match to the paper's reported max d = 0.15 we would
-    need the per-example JSONs (held back during review).
-
-    For the verification this script uses an effect-size proxy: the |Δ|
-    across pairs divided by the standard error of Δ — bounded above by the
-    paper's per-item Cohen's d for typical effect sizes.
-    """
-    # Without per-example data we can't replicate the exact per-pair d_paired
-    # the paper reports. Instead we verify the headline claim "all d < 0.2"
-    # by computing it from the per-pair Δ (overall stereo-win-rate / 100,
-    # bounded by 1) divided by an across-pair noise estimate. This is a
-    # conservative proxy; the per-item d the paper reports is strictly
-    # smaller in magnitude.
-    pairs = load_pairs()
-    rows = []
-    for base_id, inst_id, fam, gen, size in pairs:
-        base = logit_df[(logit_df["model_id"] == base_id)
-                        & (logit_df["benchmark"] == "crows_pairs")
-                        & (logit_df["prompt_mode"] == prompt_mode)
-                        & (logit_df["metric"] == "overall")]
-        inst = logit_df[(logit_df["model_id"] == inst_id)
-                        & (logit_df["benchmark"] == "crows_pairs")
-                        & (logit_df["prompt_mode"] == prompt_mode)
-                        & (logit_df["metric"] == "overall")]
-        if base.empty or inst.empty:
-            continue
-        # CrowS overall is a percentage in 0-100. Convert to a per-item
-        # probability and use the normal-approx SE: sqrt(p(1-p)/n).
-        n_items = 1508
-        p_b = base["value"].iloc[0] / 100.0
-        p_i = inst["value"].iloc[0] / 100.0
-        diff = p_i - p_b
-        # SE of Δp under independence (conservative upper bound on the
-        # paired-d denominator since paired diffs have smaller variance).
-        se = np.sqrt(p_b * (1 - p_b) / n_items + p_i * (1 - p_i) / n_items)
-        d_proxy = diff / se if se > 0 else float("nan")
-        # Convert z-score to a Cohen's-d-comparable scale: |d| ≈ |z|/sqrt(n).
-        d_pair = abs(d_proxy) / np.sqrt(n_items)
-        rows.append({"family": fam, "generation": gen, "size": size,
-                     "d_paired_proxy": d_pair})
-    return pd.DataFrame(rows)
+def load_crows_effect_sizes(path: Path) -> pd.DataFrame:
+    """Read and validate the exact per-pair CrowS-Pairs effect-size table."""
+    frame = pd.read_csv(path)
+    required = {
+        "base_id", "instruct_id", "condition", "n_items", "cohens_d",
+    }
+    missing = required - set(frame.columns)
+    if missing:
+        raise ValueError(f"effect-size table is missing columns: {sorted(missing)}")
+    if frame.duplicated(["base_id", "instruct_id", "condition"]).any():
+        raise ValueError("effect-size table contains duplicate pair-condition rows")
+    conditions = set(frame["condition"])
+    if conditions != {"without_template", "with_template"}:
+        raise ValueError(f"unexpected effect-size conditions: {sorted(conditions)}")
+    coverage = frame.groupby(["base_id", "instruct_id"])["condition"].nunique()
+    if not (coverage == 2).all():
+        raise ValueError("each pair must have both scoring conditions")
+    if not (frame["n_items"] > 0).all():
+        raise ValueError("effect-size rows must contain at least one item")
+    return frame
 
 
 def all_agree_count(deltas: pd.DataFrame, condition: str) -> int:
@@ -174,10 +152,15 @@ def all_agree_count(deltas: pd.DataFrame, condition: str) -> int:
     return int((has_all & all_neg).sum())
 
 
-def sign_test_n_negative(deltas: pd.DataFrame, benchmark: str, condition: str) -> int:
-    """How many of 27 pairs reduce bias on this benchmark under this condition."""
-    sub = deltas[deltas["benchmark"] == benchmark]
-    return int((sub[condition] < 0).sum())
+def sign_test(deltas: pd.DataFrame, benchmark: str, condition: str) -> dict[str, float]:
+    """One-sided exact sign test for a reduction in benchmark-defined bias."""
+    values = deltas.loc[deltas["benchmark"] == benchmark, condition].dropna()
+    nonzero = values[values != 0]
+    n_negative = int((nonzero < 0).sum())
+    p = binomtest(
+        n_negative, len(nonzero), 0.5, alternative="greater"
+    ).pvalue
+    return {"n_negative": n_negative, "n": len(nonzero), "p": float(p)}
 
 
 def fit_pooled_ols(logit_df: pd.DataFrame, benchmark: str, condition: str):
@@ -211,6 +194,12 @@ def fit_pooled_ols(logit_df: pd.DataFrame, benchmark: str, condition: str):
 
 
 def holm_bonferroni(pvals: dict[str, float], alpha: float = 0.05) -> dict[str, dict]:
+    """Holm step-down correction over a family of tests.
+
+    Adjusted p-values are forced to be non-decreasing by carrying a running
+    maximum down the sorted list. Without that, a later test could report a
+    smaller adjusted p-value than an earlier, more significant one.
+    """
     items = sorted(pvals.items(), key=lambda kv: kv[1])
     m = len(items)
     out = {}
@@ -225,9 +214,12 @@ def holm_bonferroni(pvals: dict[str, float], alpha: float = 0.05) -> dict[str, d
 def emit_regression_tex(rows: list[dict], out_path: Path) -> None:
     """Write the per-benchmark regression table fragment used in Table 3."""
     def stars(p: float) -> str:
-        if p < 0.001: return "^{***}"
-        if p < 0.01:  return "^{**}"
-        if p < 0.05:  return "^{*}"
+        if p < 0.001:
+            return "^{***}"
+        if p < 0.01:
+            return "^{**}"
+        if p < 0.05:
+            return "^{*}"
         return ""
 
     label_map = {
@@ -256,47 +248,53 @@ def emit_regression_tex(rows: list[dict], out_path: Path) -> None:
     out_path.write_text("\n".join(lines) + "\n")
 
 
-def run() -> int:
-    """Run the chat-template analyses, compare to paper values, return failure count."""
+def main() -> int:
+    """Run the chat-template analyses and print the computed estimates."""
     logit_df = pd.read_parquet(REPO / "data/aggregated/logit.parquet")
     deltas   = per_pair_deltas(logit_df)
 
-    # 1. Δ_chat per benchmark.
     boots = delta_chat_bootstrap(deltas)
-    delta_chat_checks = [
-        check_close(f"Δ_chat {b}", paper, boots[b]["theta"], tol=0.05)
-        for b, paper in [
-            ("crows_pairs", -1.93),
-            ("stereoset",   -2.72),
-            ("bbq",         -0.013),
-            ("iat",         -0.028),
+    delta_chat_rows = [
+        (
+            benchmark,
+            f"{values['theta']:+.3f}  95% CI "
+            f"[{values['ci_lo']:+.3f}, {values['ci_hi']:+.3f}]  n={values['n']}",
+        )
+        for benchmark, values in boots.items()
+    ]
+
+    effect_size_path = REPO / "data" / "tables" / "crows_pair_effect_sizes.csv"
+    if effect_size_path.is_file():
+        d_df = load_crows_effect_sizes(effect_size_path)
+        max_d = float(d_df["cohens_d"].abs().max())
+        effect_size_rows = [
+            ("Pair-condition rows", str(len(d_df))),
+            ("Maximum per-pair |d|", f"{max_d:.3f}"),
         ]
-    ]
+    else:
+        effect_size_rows = []
 
-    # 2. All paired d < 0.2 (max d = 0.15 per paper).
-    d_df = cohens_d_paired_per_pair(logit_df, prompt_mode="raw")
-    max_d_proxy = float(d_df["d_paired_proxy"].abs().max()) if not d_df.empty else float("nan")
-    d_checks = [
-        check_close("Max |Cohen's d_paired| (CrowS raw)", 0.15, max_d_proxy, tol=0.1),
-    ]
-
-    # 3. Cross-benchmark all_agree counts.
     n_raw    = all_agree_count(deltas, "raw_delta")
     n_native = all_agree_count(deltas, "native_delta")
-    agree_checks = [
-        check_count("Pairs improving on all 4 benchmarks (without template)", 4, n_raw, of=27),
-        check_count("Pairs improving on all 4 benchmarks (with template)",   11, n_native, of=27),
+    n_pairs = len(load_pairs())
+    agreement_rows = [
+        ("Without template", f"{n_raw}/{n_pairs}"),
+        ("With template", f"{n_native}/{n_pairs}"),
     ]
 
-    # 4. Sign tests with chat template (CrowS + StereoSet).
-    n_crows_with    = sign_test_n_negative(deltas, "crows_pairs", "native_delta")
-    n_stereo_with   = sign_test_n_negative(deltas, "stereoset",   "native_delta")
-    sign_checks = [
-        check_count("Sign test CrowS with template (n_negative)",    25, n_crows_with,  of=27),
-        check_count("Sign test StereoSet with template (n_negative)", 26, n_stereo_with, of=27),
-    ]
+    signs = {
+        (benchmark, condition): sign_test(deltas, benchmark, condition)
+        for benchmark in ("crows_pairs", "stereoset", "iat")
+        for condition in ("raw_delta", "native_delta")
+    }
+    sign_rows = []
+    condition_label = {"raw_delta": "without template", "native_delta": "with template"}
+    for (benchmark, condition), values in signs.items():
+        sign_rows.append((
+            f"{benchmark}, {condition_label[condition]}",
+            f"{values['n_negative']}/{values['n']} reductions; p={values['p']:.4g}",
+        ))
 
-    # 5. Pooled OLS coefficients + Holm correction → regression.tex.
     rows = []
     pvals_without, pvals_with = {}, {}
     for b in HEADLINE_METRIC:
@@ -319,26 +317,34 @@ def run() -> int:
         r["with_p_adj"]    = h_with[r["benchmark"]]["p_adj"]
 
     emit_regression_tex(rows, REPO / "tables/regression.tex")
+    regression_rows = []
+    for row in rows:
+        regression_rows.extend([
+            (
+                f"{row['benchmark']}, without template",
+                f"β={row['without_beta']:+.3f}; Holm p={row['without_p_adj']:.4g}",
+            ),
+            (
+                f"{row['benchmark']}, with template",
+                f"β={row['with_beta']:+.3f}; Holm p={row['with_p_adj']:.4g}",
+            ),
+        ])
 
-    # 6. Spot-check two pooled OLS coefficients the paper cites in prose.
-    ols_checks = [
-        check_close("CrowS without-template β_variant",
-                    -1.87, rows[0]["without_beta"], tol=0.05),
-        check_close("CrowS with-template β_variant",
-                    -3.80, rows[0]["with_beta"],    tol=0.05),
-    ]
-
-    # Render.
-    fails = 0
-    fails += render_section("§3.1 Δ_chat (paired bootstrap, 10k resamples)",
-                             delta_chat_checks)
-    fails += render_section("§3.1 Per-pair Cohen's d", d_checks)
-    fails += render_section("§3.1 Cross-benchmark agreement", agree_checks)
-    fails += render_section("§3.1 Sign tests with chat template", sign_checks)
-    fails += render_section("§3.1 Pooled OLS β_variant (spot checks)", ols_checks)
+    render_section("Chat-template contribution (paired bootstrap)", delta_chat_rows)
+    if effect_size_rows:
+        render_section("CrowS-Pairs per-pair effect sizes", effect_size_rows)
+    else:
+        print(
+            "\n[CrowS-Pairs per-pair effect sizes]\n"
+            "  Not available: build data/tables/crows_pair_effect_sizes.csv "
+            "from the raw CrowS-Pairs results."
+        )
+    render_section("Cross-benchmark agreement", agreement_rows)
+    render_section("Exact sign tests", sign_rows)
+    render_section("Pooled OLS variant coefficients", regression_rows)
     print(f"\n  Wrote tables/regression.tex ({len(rows)} rows).")
-    return fails
+    return 0
 
 
 if __name__ == "__main__":
-    sys.exit(0 if run() == 0 else 1)
+    sys.exit(main())

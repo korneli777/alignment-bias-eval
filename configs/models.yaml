@@ -1,7 +1,7 @@
   # Model registry consumed by every run_*.py script. Each entry under a
-  # family defines a (base, instruct) pair; the toolkit iterates over them.
+  # family defines a (base, instruct) pair. The toolkit iterates over them.
   # The release ships 27 pairs (Llama, Qwen, Mistral, Gemma) loaded in
-  # bfloat16; add your own families or swap individual model_ids as needed.
+  # bfloat16. Add your own families or swap individual model_ids as needed.
 
 families:
   llama:
@@ -108,9 +108,6 @@ families:
             num_layers: 48
             hidden_size: 5120
             dtype: "bfloat16"
-          # Qwen 2.5-32B excluded: ~64GB in bf16 doesn't fit on A100 40GB
-          # disk and won't load on standard Colab without H100. Sufficient
-          # size axis is preserved by 0.5B → 14B (~4.5 orders of magnitude).
       - name: "Qwen 3"
         release_date: "2025-04"
         models:
@@ -149,9 +146,6 @@ families:
             num_layers: 40
             hidden_size: 5120
             dtype: "bfloat16"
-          # Qwen 3-32B excluded: Qwen released only the instruct checkpoint
-          # publicly (Qwen3-32B-Base returns 401), so there's no base to
-          # pair against. Plus same disk-fit issues as Qwen 2.5-32B.
 
   gemma:
     display_name: "Gemma"
@@ -239,7 +233,6 @@ families:
             num_layers: 32
             hidden_size: 4096
             dtype: "bfloat16"
-      # Mistral v0.2 excluded: Mistral released only the instruct checkpoint
       - name: "Mistral v0.3"
         release_date: "2024-05"
         models:
@@ -275,9 +268,7 @@ families:
 
 # Subset for linear probing + INLP/LEACE intervention.
 # Spans 4-24B (~0.8 orders of magnitude)
-# For models >14B, stream activations to disk one layer at a time.
 probing_subset:
-  # 4-9B: original cross-family representative pairs
   - "meta-llama/Llama-2-7b-hf"
   - "meta-llama/Llama-2-7b-chat-hf"
   - "meta-llama/Llama-3.1-8B"
@@ -290,7 +281,6 @@ probing_subset:
   - "google/gemma-3-4b-it"
   - "mistralai/Mistral-7B-v0.3"
   - "mistralai/Mistral-7B-Instruct-v0.3"
-  # 13-24B: extension for size-axis breadth in the probing stage
   - "meta-llama/Llama-2-13b-hf"
   - "meta-llama/Llama-2-13b-chat-hf"
   - "mistralai/Mistral-Small-24B-Base-2501"

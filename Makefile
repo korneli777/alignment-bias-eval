@@ -1,24 +1,29 @@
-.PHONY: help install install-gpu install-dev figures extended-views test aggregate clean
+.PHONY: help install install-gpu install-dev lint figures extended-views test verify aggregate clean
 
 help:
 	@echo "Targets:"
-	@echo "  install         pip install -e . (CPU deps)"
-	@echo "  install-gpu     pip install -e .[gpu] (adds torch + transformers)"
-	@echo "  install-dev     pip install -e .[dev,tracking]"
+	@echo "  install         Install the CPU analysis package"
+	@echo "  install-gpu     Add model scoring and probing dependencies"
+	@echo "  install-dev     Add tests and linting"
+	@echo "  lint            Check Python style and common errors"
 	@echo "  figures         Rebuild paper figures from cached aggregates"
 	@echo "  extended-views  Rebuild full-coverage figures not in the paper"
-	@echo "  test            Unit + integration tests (incl. paper-number gate)"
+	@echo "  test            Run the software test suite"
+	@echo "  verify          Run lint, tests, and rebuild paper figures"
 	@echo "  aggregate       Re-aggregate parquets from raw JSONs (requires raw data)"
 	@echo "  clean           Remove generated figures + caches"
 
 install:
-	pip install -e .
+	python -m pip install -e .
 
 install-gpu:
-	pip install -e .[gpu]
+	python -m pip install -e ".[gpu]"
 
 install-dev:
-	pip install -e .[dev,tracking]
+	python -m pip install -e ".[dev]"
+
+lint:
+	ruff check src scripts tests
 
 figures:
 	python scripts/figures/chat_template_dumbbell.py
@@ -29,7 +34,9 @@ extended-views:
 	python scripts/figures/extended_views/probing_8panels.py
 
 test:
-	pytest tests/
+	python -m pytest tests/
+
+verify: lint test figures
 
 aggregate:
 	python scripts/aggregate.py

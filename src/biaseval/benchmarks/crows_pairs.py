@@ -18,9 +18,9 @@ from collections import defaultdict
 
 from tqdm import tqdm
 
+from biaseval.benchmarks.framings import FRAMINGS
 from biaseval.benchmarks.utils import (
     COMPLETION_INSTRUCTION,
-    JAILBREAK_INSTRUCTION,
     BenchmarkResult,
     conditional_log_prob,
     sentence_log_prob,
@@ -46,7 +46,8 @@ def run(
     prompt_mode:
         raw      score lp(sentence) directly.
         instruct score lp(sentence | chat-templated instruction).
-        jailbreak persona-injection prefix (see utils.JAILBREAK_INSTRUCTION).
+        jb_*     one of the recoverability framings; scored like instruct,
+                 with the framing preamble in place of the plain instruction.
     language:
         "en" (original NYU release, 1508 pairs) or "fr"
         (jannalu/crows_pairs_multilingual mirror, 1677 pairs).
@@ -61,8 +62,8 @@ def run(
 
         def score(sent: str) -> tuple[float, int]:
             return conditional_log_prob(model, tokenizer, prefix, " " + sent, add_special_tokens=False)
-    elif prompt_mode == "jailbreak":
-        prefix = wrap_chat_template(tokenizer, JAILBREAK_INSTRUCTION)
+    elif prompt_mode in FRAMINGS:
+        prefix = wrap_chat_template(tokenizer, FRAMINGS[prompt_mode].crows_user_message())
 
         def score(sent: str) -> tuple[float, int]:
             return conditional_log_prob(model, tokenizer, prefix, " " + sent, add_special_tokens=False)

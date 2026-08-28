@@ -1,4 +1,6 @@
-"""Stage 2 — extract residual-stream activations and train layer-wise probes.
+"""Stage 2
+
+Extract residual-stream activations and train layer-wise probes.
 
 For each model in the probing subset:
   1. Build the labelled probe dataset for each attribute (gender, race).
@@ -31,7 +33,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--family", default=None)
     p.add_argument("--variant", default=None, choices=["base", "instruct"])
     p.add_argument("--mask-keywords", action="store_true",
-                   help="Audit-3 controlled probe: exclude demographic-keyword "
+                   help="Controlled probe: exclude demographic-keyword "
                         "tokens from the activation pool to prevent surface-form "
                         "leakage. Activations and probe results are written to "
                         "separate `*_masked` directories so the unmasked baseline "
@@ -92,9 +94,8 @@ def main() -> int:
     probe_datasets = {attr: build_probe_dataset(attr, max_per_class=max_per_class)
                       for attr in attributes}
 
-    # Audit-3 controlled probe: build the keyword union from all attributes
-    # we're probing for, so a single masked extraction works for both gender
-    # and race probes.
+    # Build one keyword union so the same masked extraction can support every
+    # requested attribute.
     mask_keywords: set[str] | None = None
     if args.mask_keywords:
         from biaseval.probing.datasets import GENDER_KEYWORDS, RACE_KEYWORDS
@@ -141,7 +142,7 @@ def main() -> int:
         logger.info("[load] %s — extracting %d sentences", spec.model_id, len(all_sentences))
         try:
             model, tokenizer = load_model(spec)
-        except Exception:
+        except Exception:  # Isolate failures to one model.
             logger.error("[error] failed to load %s\n%s", spec.model_id, traceback.format_exc())
             n_errors += len(pending)
             continue
@@ -155,7 +156,7 @@ def main() -> int:
                 pool=pool, batch_size=batch_size,
                 mask_keywords=mask_keywords,
             )
-        except Exception:
+        except Exception:  # Isolate failures to one model.
             logger.error("[error] activation extraction failed for %s\n%s",
                          spec.model_id, traceback.format_exc())
             unload_model(model)
@@ -225,7 +226,7 @@ def main() -> int:
                     tracker.summary_update({"peak_accuracy": peak,
                                             "n_sentences": len(labels)})
                     n_done += 1
-                except Exception:
+                except Exception:  # Isolate failures to one attribute.
                     logger.error("[error] probe %s on %s\n%s", attr, spec.model_id,
                                  traceback.format_exc())
                     n_errors += 1

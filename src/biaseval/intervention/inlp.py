@@ -25,6 +25,13 @@ logger = logging.getLogger(__name__)
 
 @dataclass
 class NullspaceResult:
+    """Outcome of an INLP fit.
+
+    `accuracy_curve` records probe accuracy after each nullspace step. It is
+    what shows whether the direction was actually removed or the fit simply ran
+    out of iterations, and `converged` distinguishes the two.
+    """
+
     projection: np.ndarray
     n_iterations: int
     accuracy_curve: list[float]
@@ -96,6 +103,12 @@ def fit_inlp(
 
 @dataclass
 class LeaceResult:
+    """Outcome of a LEACE fit.
+
+    `bias` is the feature mean. Erasure is affine, not a plain projection, so
+    both terms are needed to apply it: `x' = (x - bias) @ projection + bias`.
+    """
+
     projection: np.ndarray
     bias: np.ndarray
     method: str = "leace"

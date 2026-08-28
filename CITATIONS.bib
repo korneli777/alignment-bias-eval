@@ -1,89 +1,173 @@
 % Datasets and methods used by this toolkit. When using a component, please
-% also cite the underlying work.
+% also cite the underlying work. These entries are copied verbatim from the
+% paper's bibliography, so keys and metadata match the published references.
 
-% --- Benchmarks ------------------------------------------------------------
+% --- Benchmarks --------------------------------------------------------------
 
 @inproceedings{nangia2020crows,
-  title     = {{CrowS-Pairs}: A Challenge Dataset for Measuring Social Biases
-               in Masked Language Models},
-  author    = {Nangia, Nikita and Vania, Clara and Bhalerao, Rasika and
-               Bowman, Samuel R.},
-  booktitle = {Proceedings of EMNLP},
+  author    = {Nangia, Nikita and Vania, Clara and Bhalerao, Rasika and Bowman, Samuel R.},
+  title     = {{CrowS-Pairs}: A Challenge Dataset for Measuring Social Biases in Masked Language Models},
+  booktitle = {Proceedings of the 2020 Conference on Empirical Methods in Natural Language Processing (EMNLP)},
+  pages     = {1953--1967},
   year      = {2020},
+  doi       = {10.18653/v1/2020.emnlp-main.154}
 }
 
 @inproceedings{nadeem2021stereoset,
-  title     = {{StereoSet}: Measuring Stereotypical Bias in Pretrained
-               Language Models},
   author    = {Nadeem, Moin and Bethke, Anna and Reddy, Siva},
-  booktitle = {Proceedings of ACL-IJCNLP},
+  title     = {{StereoSet}: Measuring stereotypical bias in pretrained language models},
+  booktitle = {Proceedings of the 59th Annual Meeting of the Association for Computational Linguistics and the 11th International Joint Conference on Natural Language Processing (Volume 1: Long Papers)},
+  pages     = {5356--5371},
   year      = {2021},
+  doi       = {10.18653/v1/2021.acl-long.416}
 }
 
 @inproceedings{parrish2022bbq,
+  author    = {Parrish, Alicia and Chen, Angelica and Nangia, Nikita and Padmakumar, Vishakh and Phang, Jason and Thompson, Jana and Htut, Phu Mon and Bowman, Samuel R.},
   title     = {{BBQ}: A Hand-Built Bias Benchmark for Question Answering},
-  author    = {Parrish, Alicia and Chen, Angelica and Nangia, Nikita and
-               Padmakumar, Vishakh and Phang, Jason and Thompson, Jana and
-               Htut, Phu Mon and Bowman, Samuel R.},
-  booktitle = {Findings of ACL},
+  booktitle = {Findings of the Association for Computational Linguistics: ACL},
+  pages     = {2086--2105},
   year      = {2022},
+  doi       = {10.18653/v1/2022.findings-acl.165}
 }
 
-@article{bai2025iat,
-  title   = {Explicitly Unbiased Large Language Models Still Form
-             Biased Associations},
-  author  = {Bai, Xuechunzi and Wang, Angelina and Sucholutsky, Ilia and
-             Griffiths, Thomas L.},
+@article{bai2025explicitly,
+  author  = {Bai, Xuechunzi and Wang, Angelina and Sucholutsky, Ilia and Griffiths, Thomas L.},
+  title   = {Explicitly unbiased large language models still form biased associations},
   journal = {Proceedings of the National Academy of Sciences},
+  volume  = {122},
+  number  = {8},
+  pages   = {e2416228122},
   year    = {2025},
+  doi     = {10.1073/pnas.2416228122}
 }
 
-@article{caliskan2017weat,
-  title   = {Semantics Derived Automatically from Language Corpora Contain
-             Human-Like Biases},
+@article{caliskan2017semantics,
   author  = {Caliskan, Aylin and Bryson, Joanna J. and Narayanan, Arvind},
+  title   = {Semantics derived automatically from language corpora contain human-like biases},
   journal = {Science},
   volume  = {356},
   number  = {6334},
   pages   = {183--186},
   year    = {2017},
+  doi     = {10.1126/science.aal4230}
 }
 
-% --- Probing-dataset sources ----------------------------------------------
+@inproceedings{kurita2019measuring,
+  author    = {Kurita, Keita and Vyas, Nidhi and Pareek, Ayush and Black, Alan W. and Tsvetkov, Yulia},
+  title     = {Measuring Bias in Contextualized Word Representations},
+  booktitle = {Proceedings of the First Workshop on Gender Bias in Natural Language Processing},
+  month     = aug,
+  pages     = {166--172},
+  year      = {2019},
+  doi       = {10.18653/v1/W19-3823}
+}
 
-@inproceedings{zhao2018winobias,
-  title     = {Gender Bias in Coreference Resolution: Evaluation and
-               Debiasing Methods},
-  author    = {Zhao, Jieyu and Wang, Tianlu and Yatskar, Mark and
-               Ordonez, Vicente and Chang, Kai-Wei},
-  booktitle = {Proceedings of NAACL-HLT},
+% --- Recoverability-framing sources ------------------------------------------
+
+@inproceedings{deshpande2023toxicity,
+  author    = {Deshpande, Ameet and Murahari, Vishvak and Rajpurohit, Tanmay and Kalyan, Ashwin and Narasimhan, Karthik},
+  title     = {Toxicity in {ChatGPT}: Analyzing Persona-assigned Language Models},
+  booktitle = {Findings of the Association for Computational Linguistics: EMNLP 2023},
+  pages     = {1236--1270},
+  year      = {2023},
+  doi       = {10.18653/v1/2023.findings-emnlp.88}
+}
+
+@inproceedings{cantini2024bias,
+  author    = {Cantini, Riccardo and Cosenza, Giada and Orsino, Alessio and Talia, Domenico},
+  title     = {Are Large Language Models Really Bias-Free? {J}ailbreak Prompts for Assessing Adversarial Robustness to Bias Elicitation},
+  booktitle = {Discovery Science (DS)},
+  series    = {Lecture Notes in Computer Science},
+  pages     = {52--68},
+  publisher = {Springer},
+  year      = {2024},
+  doi       = {10.1007/978-3-031-78977-9_4}
+}
+
+@misc{bouchouchi2026alignment,
+  author = {Bouchouchi, Nour and Laugel, Thibault and Renard, Xavier and Marsala, Christophe and Lesot, Marie-Jeanne and Detyniecki, Marcin},
+  title  = {Alignment Reduces Expressed but Not Encoded Gender Bias: A Unified Framework and Study},
+  year   = {2026},
+  url    = {https://arxiv.org/abs/2603.24125},
+  journal      = {CoRR},
+  volume       = {abs/2603.24125},
+  eprinttype   = {arXiv},
+  eprint       = {2603.24125}
+}
+
+% --- Probing-dataset sources -------------------------------------------------
+
+@inproceedings{zhao2018gender,
+  author    = {Zhao, Jieyu and Wang, Tianlu and Yatskar, Mark and Ord{\'o}{\~n}ez, Vicente and Chang, Kai-Wei},
+  title     = {Gender Bias in Coreference Resolution: Evaluation and Debiasing Methods},
+  booktitle = {Proceedings of the 2018 Conference of the North American Chapter of the Association for Computational Linguistics: Human Language Technologies, Volume 2 (Short Papers)},
+  pages     = {15--20},
   year      = {2018},
+  doi       = {10.18653/v1/N18-2003}
 }
 
-% --- Concept-erasure methods ----------------------------------------------
+% --- Concept-erasure methods -------------------------------------------------
 
-@inproceedings{ravfogel2020inlp,
-  title     = {Null It Out: Guarding Protected Attributes by Iterative
-               Nullspace Projection},
-  author    = {Ravfogel, Shauli and Elazar, Yanai and Gonen, Hila and
-               Twiton, Michael and Goldberg, Yoav},
-  booktitle = {Proceedings of ACL},
+@inproceedings{ravfogel2020null,
+  author    = {Ravfogel, Shauli and Elazar, Yanai and Gonen, Hila and Twiton, Michael and Goldberg, Yoav},
+  title     = {Null It Out: Guarding Protected Attributes by Iterative Nullspace Projection},
+  booktitle = {Proceedings of the 58th Annual Meeting of the Association for Computational Linguistics (ACL)},
+  pages     = {7237--7256},
   year      = {2020},
+  doi       = {10.18653/v1/2020.acl-main.647}
 }
 
 @inproceedings{belrose2023leace,
-  title     = {{LEACE}: Perfect Linear Concept Erasure in Closed Form},
-  author    = {Belrose, Nora and Schneider-Joseph, David and Ravfogel, Shauli
-               and Cotterell, Ryan and Raff, Edward and Biderman, Stella},
-  booktitle = {Advances in Neural Information Processing Systems},
+  author    = {Belrose, Nora and Schneider-Joseph, David and Ravfogel, Shauli and Cotterell, Ryan and Raff, Edward and Biderman, Stella},
+  title     = {{LEACE}: Perfect linear concept erasure in closed form},
+  booktitle = {Advances in Neural Information Processing Systems 36 (NeurIPS)},
   year      = {2023},
+  url       = {https://arxiv.org/abs/2306.03819},
+  pages     = {66044--66063},
+  doi       = {10.52202/075280-2884}
+}
+
+% --- Statistical methods and software ----------------------------------------
+
+@article{holm1979simple,
+  author  = {Holm, Sture},
+  title   = {A Simple Sequentially Rejective Multiple Test Procedure},
+  journal = {Scandinavian Journal of Statistics},
+  volume  = {6},
+  number  = {2},
+  pages   = {65--70},
+  year    = {1979}
+}
+
+@book{cohen1988statistical,
+  author    = {Cohen, Jacob},
+  title     = {Statistical Power Analysis for the Behavioral Sciences},
+  edition   = {2nd},
+  publisher = {Lawrence Erlbaum Associates},
+  address   = {Hillsdale, NJ},
+  year      = {1988},
+  isbn      = {0-8058-0283-5}
+}
+
+@article{pedregosa2011scikit,
+  author  = {Pedregosa, Fabian and Varoquaux, Ga{\"e}l and Gramfort, Alexandre and Michel, Vincent and Thirion, Bertrand and Grisel, Olivier and Blondel, Mathieu and Prettenhofer, Peter and Weiss, Ron and Dubourg, Vincent and Vanderplas, Jake and Passos, Alexandre and Cournapeau, David and Brucher, Matthieu and Perrot, Matthieu and Duchesnay, {\'E}douard},
+  title   = {Scikit-learn: Machine Learning in {P}ython},
+  journal = {Journal of Machine Learning Research},
+  volume  = {12},
+  pages   = {2825--2830},
+  year    = {2011},
+  doi     = {10.5555/1953048.2078195}
 }
 
 % --- This work ------------------------------------------------------------
 
-@inproceedings{anonymous2026alignment,
-  title  = {Does Alignment Debias or Just Suppress?},
-  author = {Anonymous},
-  year   = {2026},
-  note   = {Under review at EMNLP 2026},
+@inproceedings{havstein2026alignment,
+  title     = {Does Alignment Debias or Just Suppress? Evaluating Stereotypical
+               Bias Across Base-Instruct Pairs},
+  author    = {Havstein, Sigurd Kornelius and S{\o}gaard, Anders},
+  booktitle = {Proceedings of the 2026 Conference on Empirical Methods in
+               Natural Language Processing},
+  year      = {2026},
+  note      = {To appear},
 }
