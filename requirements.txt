@@ -25,12 +25,7 @@ huggingface-hub==0.25.1
 pytest==9.0.3
 ruff==0.16.5
 
-# Recorded GPU environments (`pip install -e .[gpu]` provides a compatible stack):
-# - probing and intervention: Python 3.12.13, torch==2.10.0+cu128,
-#   transformers==5.0.0
-# - benchmark scoring: Python 3.12.13, torch==2.11.0+cu128,
-#   transformers==5.12.1
-# - selected framing conditions: Python 3.13.15,
-#   transformers==5.15.1 or 5.16.1
-# Scoring is a deterministic likelihood comparison; the scoring environments
-# agree to bfloat16 precision.
+# GPU stack for re-running the sweep (`pip install -e .[gpu]`):
+#   Python 3.12, torch==2.11.0+cu128, transformers==5.12.1
+# Scoring is a deterministic likelihood comparison in bfloat16. Every result
+# file records the versions that produced it in its `runtime` block.

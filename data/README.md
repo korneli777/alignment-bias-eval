@@ -26,6 +26,10 @@ downloading model weights or running a GPU sweep.
 
 The CSV files under `tables/` hold the gender-direction cosines, the random-
 pair cosine baseline, and the layer-wise probe values used in Section 3.3.
+`tables/crows_pair_effect_sizes.csv` holds the exact per-pair CrowS-Pairs
+effect sizes of Section 3.1: paired outcome counts and Cohen's d for each pair
+under both scoring conditions. It carries no benchmark sentences and no model
+log probabilities.
 `probe_results/` and `intervention_results/` retain the smaller per-cell JSON
 summaries from which the aggregate tables were built.
 Each of these JSONs includes the recorded Python, PyTorch, Transformers,
@@ -49,7 +53,7 @@ contain model outputs and derived statistics, not copies of the original
 benchmark texts. Model identifiers and pair definitions are preserved in
 `configs/models.yaml`.
 
-To rebuild the aggregates from per-cell JSONs, run:
+Three scripts rebuild the aggregates after a full rerun:
 
 ```bash
 python scripts/aggregate.py
@@ -57,19 +61,19 @@ python scripts/analysis/build_bbq_items.py
 python scripts/analysis/build_crows_effect_sizes.py
 ```
 
-The CrowS-Pairs exporter writes paired outcome counts and exact per-pair
-Cohen's d for both scoring conditions to
-`tables/crows_pair_effect_sizes.csv`. It does not copy benchmark sentences or
-model log probabilities into the released table.
+All three read `data/raw_logit_scores/`, which is not part of this compact
+release. The tables they write are included here; their inputs are not.
 
-`scripts/aggregate.py` includes every prompt condition found under
-`data/raw_logit_scores/`, including recoverability framings. A full rerun
-therefore uses the same aggregation path for baseline and framing results.
+`scripts/aggregate.py` includes every prompt condition it finds there,
+including the recoverability framings. Baseline and framing results go through
+one aggregation path.
 
-`build_bbq_items.py` requires the raw BBQ result JSONs, which are not included
-in the compact release. It verifies that conditions use the same selected item
-set and refuses to overwrite the aggregate when a cell is missing;
-`--allow-incomplete` is available only for diagnostic work.
+`build_bbq_items.py` checks that every condition uses the same selected item
+set, and refuses to write when a cell is missing. `--allow-incomplete` is for
+diagnostic work only.
+
+`build_crows_effect_sizes.py` writes `tables/crows_pair_effect_sizes.csv` from
+the item-level CrowS-Pairs outcomes.
 
 ## License
 

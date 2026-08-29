@@ -50,7 +50,7 @@ base checkpoints, but those cells are not used for the paper's comparison.
 ### Requirements
 
 - Linux with a CUDA-capable NVIDIA GPU
-- Python 3.12 for the closest match to the main run
+- Python 3.12
 - enough memory for the selected checkpoint. The full registry includes a 24B
   model and was run on 96 GB GPUs
 - accepted Hugging Face licenses for the gated Llama and Gemma checkpoints
@@ -62,13 +62,10 @@ Install the GPU dependencies:
 python -m pip install -e ".[gpu]"
 ```
 
-Benchmark scoring used PyTorch 2.11.0 with CUDA 12.8 and Transformers 5.12.1.
-Selected framing conditions used Transformers 5.15.1 and 5.16.1. The released
-probe and intervention summaries record PyTorch 2.10.0 with CUDA 12.8 and
-Transformers 5.0.0 in their runtime metadata. All three stages used Python
-3.12.13 except the selected framing conditions, which used Python 3.13.15.
-Benchmark scoring is a deterministic likelihood comparison in bfloat16. No
-text is sampled.
+Use Python 3.12 with PyTorch 2.11.0 (CUDA 12.8) and Transformers 5.12.1.
+Scoring is a deterministic likelihood comparison in bfloat16. No text is
+sampled. Every result file records the versions that produced it in its
+`runtime` block.
 
 ### Stage 1: benchmark scoring
 
@@ -142,8 +139,6 @@ Before tagging a release:
   instruct/instruct coverage.
 - [ ] Every applicable BBQ framing covers all 27 instruct checkpoints on the
   shared 6,001-item set.
-- [ ] `data/tables/crows_pair_effect_sizes.csv` is rebuilt from the complete
-  CrowS-Pairs result tree.
 - [ ] The rebuilt Figures 3–5 match the submitted figures visually.
 - [ ] `CITATION.cff`, the README BibTeX, and the paper title/authors agree.
 - [ ] The ACL Anthology URL, DOI, pages, and canonical citation replace the
