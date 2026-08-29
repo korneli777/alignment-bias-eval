@@ -32,6 +32,12 @@ strongly aligned (median cosine 0.86).
 The paper treats these results as converging evidence for suppression, with the
 caveats and benchmark-specific differences discussed in Sections 3 and 4.
 
+![Conceptual comparison of debiasing and suppression under alignment.](assets/teaser.png)
+
+*Figure 1. Conceptual overview of the suppression-versus-debiasing question.
+The paper tests these alternatives through chat-template, deferral, and
+representation-level analyses.*
+
 ## Quick start
 
 The CPU path is enough to check the released results. It does not download
